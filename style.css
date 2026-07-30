@@ -1,0 +1,2145 @@
+/* =========================================================
+   D'FIVE — ARENA LOUNGE
+   Paleta: #050505 (fundo), #D4AF37 (dourado), #FCE38A (dourado claro),
+           #7A1F3D (vinho, acento VIP), rgba(255,255,255,.7) (texto secundário)
+   Tipografia: Bebas Neue (display) + Poppins (corpo) + Cormorant Garamond (aspas)
+   ========================================================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    /* === Cores Base === */
+    --ouro: #D4AF37;
+    --ouro-claro: #FCE38A;
+    --vinho: #7A1F3D;
+    --fundo: #050505;
+    --texto-suave: rgba(255, 255, 255, 0.7);
+    --vidro: rgba(212, 175, 55, 0.08);
+    --borda: rgba(212, 175, 55, 0.35);
+
+    /* === Cores Athletico (tema vermelho) === */
+    --rubro: #E10600;
+    --rubro-claro: #FF3B30;
+    --rubro-vidro: rgba(225, 6, 0, 0.12);
+    --rubro-borda: rgba(225, 6, 0, 0.50);
+
+    /* === Sistema de Brilho e Sombra === */
+    --glow-dourado: 0 0 20px rgba(212, 175, 55, 0.3), 0 0 40px rgba(212, 175, 55, 0.1);
+    --glow-dourado-forte: 0 0 30px rgba(212, 175, 55, 0.5), 0 0 60px rgba(212, 175, 55, 0.2);
+    --glow-ouro-texto: 0 0 16px rgba(212, 175, 55, 0.4);
+    --sombra-vidro: 0 8px 32px rgba(0, 0, 0, 0.5);
+    --sombra-profunda: 0 20px 60px rgba(0, 0, 0, 0.7);
+
+    /* === Transições === */
+    --transicao-suave: 0.4s cubic-bezier(0.65, 0, 0.35, 1);
+    --transicao-media: 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    --transicao-lenta: 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    --transicao-tema: 1.4s ease;
+
+    /* === Dimensões de Vidro === */
+    --vidro-blur: blur(14px);
+    --vidro-blur-forte: blur(20px);
+    --vidro-radius: 16px;
+    --vidro-radius-p: 50px;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    position: relative;
+    min-height: 100vh;
+    overflow-x: hidden;
+
+    background:
+        radial-gradient(circle at top right, var(--ouro), transparent 30%),
+        radial-gradient(circle at bottom left, rgba(212, 175, 55, 0.15), transparent 40%),
+        var(--fundo);
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: cover;
+
+    color: white;
+    font-family: "Poppins", sans-serif;
+}
+
+a {
+    color: inherit;
+    font-family: inherit;
+}
+
+::selection {
+    background: var(--ouro);
+    color: #050505;
+}
+
+:focus-visible {
+    outline: 2px solid var(--ouro-claro);
+    outline-offset: 3px;
+}
+
+/* ===== PARTÍCULAS DE FUNDO ===== */
+
+.particulas {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+}
+
+.particula {
+    position: absolute;
+    bottom: -10px;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--ouro-claro);
+    opacity: 0.5;
+    animation: subir linear infinite;
+}
+
+@keyframes subir {
+    to {
+        transform: translateY(-110vh) translateX(20px);
+        opacity: 0;
+    }
+}
+
+/* ===== HEADER FIXO (NAV) ===== */
+/* Transparente sobre a Hero. O GSAP ScrollTrigger adiciona a classe
+   .nav-fixa--scrolled (ver iniciarHeaderFixo em script.js) assim que o
+   usuário ultrapassa a Hero, ligando o fundo em vidro. A altura nunca muda,
+   pra não gerar layout shift (CLS). */
+
+.nav-fixa {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 950;
+
+    opacity: 0; /* anime.js faz a entrada ao carregar */
+    background: transparent;
+    border-bottom: 1px solid transparent;
+    backdrop-filter: blur(0px);
+    -webkit-backdrop-filter: blur(0px);
+    transition: background 0.4s ease, border-color 0.4s ease, backdrop-filter 0.4s ease;
+}
+
+.nav-fixa--scrolled {
+    background: rgba(5, 5, 5, 0.65);
+    border-bottom: 1px solid var(--borda);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+}
+
+.nav-fixa-inner {
+    max-width: 1000px;
+    margin: 0 auto;
+    height: 64px;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.nav-logo {
+    font-family: "Bebas Neue", sans-serif;
+    font-size: 20px;
+    letter-spacing: 3px;
+    color: var(--ouro-claro);
+    text-decoration: none;
+    text-shadow: 0 0 16px rgba(212, 175, 55, 0.4);
+}
+
+/* Botão hamburguer — vira "X" a partir do próprio aria-expanded,
+   sem precisar de uma classe JS extra pra controlar o visual */
+.nav-toggle {
+    position: relative;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+}
+
+.nav-toggle span {
+    width: 22px;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--ouro-claro);
+    transition: transform 0.35s cubic-bezier(0.65, 0, 0.35, 1), opacity 0.25s ease;
+}
+
+.nav-toggle[aria-expanded="true"] span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.nav-toggle[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
+.nav-toggle[aria-expanded="true"] span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* ===== OVERLAY DO MENU ===== */
+
+.nav-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1100;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 34px;
+
+    background: rgba(5, 5, 5, 0.92);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.4s ease, visibility 0.4s ease;
+}
+
+.nav-overlay.aberto {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+.nav-overlay-links {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.nav-overlay-links a {
+    display: block;
+    padding: 12px 10px;
+    font-family: "Bebas Neue", sans-serif;
+    font-size: 28px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: white;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.nav-overlay-links a:hover {
+    color: var(--ouro-claro);
+}
+
+.nav-overlay-whats {
+    display: inline-block;
+    padding: 13px 28px;
+    border-radius: 50px;
+    border: 1px solid var(--borda);
+    color: var(--ouro-claro);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+}
+
+.nav-overlay-whats:hover {
+    background: rgba(212, 175, 55, 0.12);
+    border-color: var(--ouro);
+}
+
+@media (min-width: 768px) {
+    .nav-fixa-inner { height: 72px; padding: 0 32px; }
+    .nav-logo { font-size: 22px; }
+}
+
+/* ===== HERO ===== */
+
+.hero {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 90px 20px 50px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: hidden;
+    min-height: 85vh;
+    justify-content: center;
+}
+
+/* Camadas de luz e profundidade — puramente decorativas */
+.hero-atmosfera {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: -1;
+    overflow: hidden;
+}
+
+.hero-glow {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(60px);
+    opacity: 0.45;
+    animation: heroPulsar 8s ease-in-out infinite;
+}
+
+.hero-glow--1 {
+    width: 280px;
+    height: 280px;
+    top: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: radial-gradient(circle, var(--ouro-claro), transparent 70%);
+}
+
+.hero-glow--2 {
+    width: 180px;
+    height: 180px;
+    bottom: 20%;
+    left: 10%;
+    background: radial-gradient(circle, var(--ouro), transparent 70%);
+    animation-delay: -2s;
+}
+
+.hero-glow--3 {
+    width: 200px;
+    height: 200px;
+    bottom: 15%;
+    right: 8%;
+    background: radial-gradient(circle, rgba(252, 227, 138, 0.6), transparent 70%);
+    animation-delay: -4s;
+}
+
+.hero-rays {
+    position: absolute;
+    top: -20%;
+    left: 50%;
+    width: 120%;
+    height: 80%;
+    transform: translateX(-50%);
+    background: conic-gradient(
+        from 180deg at 50% 100%,
+        transparent 0deg,
+        rgba(212, 175, 55, 0.06) 30deg,
+        transparent 60deg,
+        rgba(212, 175, 55, 0.04) 120deg,
+        transparent 180deg,
+        rgba(252, 227, 138, 0.05) 240deg,
+        transparent 300deg
+    );
+    opacity: 0.7;
+    animation: heroRays 12s linear infinite;
+}
+
+@keyframes heroPulsar {
+    0%, 100% { opacity: 0.35; transform: scale(1); }
+    50% { opacity: 0.55; transform: scale(1.08); }
+}
+
+@keyframes heroRays {
+    to { transform: translateX(-50%) rotate(360deg); }
+}
+
+.hero-glow--1 { animation-name: heroPulsarCentro; }
+
+@keyframes heroPulsarCentro {
+    0%, 100% { opacity: 0.35; transform: translateX(-50%) scale(1); }
+    50% { opacity: 0.55; transform: translateX(-50%) scale(1.08); }
+}
+
+.hero-eyebrow {
+    font-size: 12px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--texto-suave);
+    margin-bottom: 14px;
+}
+
+.hero h1 {
+    font-family: "Bebas Neue", sans-serif;
+    font-size: clamp(48px, 12vw, 84px);
+    letter-spacing: 8px;
+    line-height: 1;
+
+    background: linear-gradient(90deg, var(--ouro), var(--ouro-claro), var(--ouro));
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+
+    text-shadow: 0 0 40px rgba(212, 175, 55, 0.35);
+    animation: brilho 6s ease-in-out infinite;
+}
+
+@keyframes brilho {
+    0%, 100% { background-position: 0% center; }
+    50% { background-position: 100% center; }
+}
+
+.hero h2 {
+    font-family: "Cormorant Garamond", serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(16px, 3vw, 22px);
+    color: var(--texto-suave);
+    letter-spacing: 1px;
+    margin-top: 8px;
+}
+
+.hero-cta {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 36px;
+}
+
+.btn-primario,
+.btn-secundario {
+    display: inline-block;
+    padding: 14px 28px;
+    border-radius: 50px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: all 0.35s ease;
+}
+
+.btn-primario {
+    background: linear-gradient(135deg, var(--ouro), var(--ouro-claro));
+    color: #050505;
+    box-shadow: 0 8px 24px rgba(212, 175, 55, 0.35);
+}
+
+.btn-primario:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(212, 175, 55, 0.5);
+}
+
+.btn-secundario {
+    background: transparent;
+    color: var(--ouro-claro);
+    border: 1px solid var(--borda);
+}
+
+.btn-secundario:hover {
+    background: rgba(212, 175, 55, 0.1);
+    border-color: var(--ouro);
+}
+
+.scroll-hint {
+    margin-top: 60px;
+    width: 26px;
+    height: 42px;
+    border: 2px solid var(--borda);
+    border-radius: 20px;
+    display: flex;
+    justify-content: center;
+    padding-top: 8px;
+}
+
+.scroll-hint span {
+    width: 4px;
+    height: 8px;
+    background: var(--ouro-claro);
+    border-radius: 4px;
+    animation: rolar 1.8s ease infinite;
+}
+
+@keyframes rolar {
+    0% { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(14px); }
+}
+
+/* ===== SEÇÕES GERAIS ===== */
+
+main {
+    position: relative;
+    z-index: 1;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.secao {
+    padding: 50px 20px;
+}
+
+.secao-titulo {
+    font-family: "Bebas Neue", sans-serif;
+    font-size: 26px;
+    letter-spacing: 3px;
+    color: var(--ouro);
+    text-align: center;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+}
+
+.reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.reveal.visivel {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .reveal { opacity: 1; transform: none; transition: none; }
+    * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; }
+}
+
+/* ===== DESTAQUE / CONTAGEM REGRESSIVA ===== */
+
+.destaque {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 36px 24px;
+    text-align: center;
+
+    background: linear-gradient(145deg, rgba(122, 31, 61, 0.25), rgba(212, 175, 55, 0.08));
+    border: 1px solid var(--borda);
+    border-radius: 18px;
+    backdrop-filter: blur(12px);
+}
+
+.destaque-selo {
+    display: inline-block;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #050505;
+    background: var(--ouro-claro);
+    padding: 5px 14px;
+    border-radius: 20px;
+    margin-bottom: 14px;
+    font-weight: 700;
+}
+
+.destaque-titulo {
+    font-family: "Bebas Neue", sans-serif;
+    font-size: 34px;
+    letter-spacing: 2px;
+}
+
+.destaque-data {
+    color: var(--texto-suave);
+    font-size: 14px;
+    margin-top: 4px;
+}
+
+.contagem {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    margin: 24px 0 12px;
+}
+
+.contagem-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid var(--borda);
+    border-radius: 10px;
+    padding: 10px 14px;
+    min-width: 56px;
+}
+
+.contagem-item span {
+    font-family: "Bebas Neue", sans-serif;
+    font-size: 24px;
+    color: var(--ouro-claro);
+}
+
+.contagem-item small {
+    font-size: 9px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--texto-suave);
+}
+
+.vagas-restantes {
+    font-size: 13px;
+    color: var(--ouro-claro);
+    margin-top: 10px;
+}
+
+/* ===== CARDS DE INGRESSO (EVENTOS) ===== */
+
+.ingressos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 22px;
+}
+
+.ingresso-card {
+    position: relative;
+    display: flex;
+    align-items: stretch;
+
+    background: var(--vidro);
+    border: 1px solid var(--borda);
+    border-radius: 14px;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    transition: transform 0.35s ease, box-shadow 0.35s ease;
+}
+
+.ingresso-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 14px 30px rgba(212, 175, 55, 0.2);
+}
+
+.ingresso-corpo {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px;
+}
+
+.ingresso-mes {
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--texto-suave);
+    text-transform: uppercase;
+}
+
+.ingresso-dia {
+    font-family: "Bebas Neue", sans-serif;
+    font-size: 40px;
+    color: var(--ouro-claro);
+    line-height: 1;
+}
+
+.ingresso-info h4 {
+    font-size: 16px;
+    margin-bottom: 4px;
+}
+
+.ingresso-info p {
+    font-size: 12px;
+    color: var(--texto-suave);
+}
+
+.ingresso-picote {
+    position: relative;
+    width: 0;
+    border-left: 2px dashed var(--borda);
+}
+
+.ingresso-picote::before,
+.ingresso-picote::after {
+    content: "";
+    position: absolute;
+    left: -8px;
+    width: 16px;
+    height: 16px;
+    background: var(--fundo);
+    border-radius: 50%;
+}
+
+.ingresso-picote::before { top: -8px; }
+.ingresso-picote::after { bottom: -8px; }
+
+.ingresso-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 90px;
+    text-decoration: none;
+    color: #050505;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    background: linear-gradient(135deg, var(--ouro), var(--ouro-claro));
+    writing-mode: horizontal-tb;
+    transition: filter 0.3s ease;
+}
+
+.ingresso-btn:hover {
+    filter: brightness(1.1);
+}
+
+/* ===== GALERIA DE VÍDEOS ===== */
+
+.video-carrossel {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding: 30px 10px;
+    cursor: grab;
+    user-select: none;
+    scrollbar-width: none;
+}
+
+.video-carrossel::-webkit-scrollbar { display: none; }
+.video-carrossel.arrastando { cursor: grabbing; }
+
+.video-card {
+    flex: 0 0 auto;
+    width: 220px;
+    height: 380px;
+    scroll-snap-align: center;
+    border-radius: 18px;
+    overflow: hidden;
+
+    background: var(--vidro);
+    border: 1px solid var(--borda);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+
+    animation: flutuar 4s ease-in-out infinite;
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.video-card:nth-child(2) { animation-delay: 0.5s; }
+.video-card:nth-child(3) { animation-delay: 1s; }
+.video-card:nth-child(4) { animation-delay: 1.5s; }
+
+.video-card:hover {
+    transform: scale(1.04);
+    box-shadow: 0 14px 40px rgba(212, 175, 55, 0.4);
+}
+
+.video-card video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none;
+}
+
+@keyframes flutuar {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+
+/* ===== LINE-UP ===== */
+
+.lineup-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 24px;
+}
+
+.lineup-card {
+    text-align: center;
+}
+
+.lineup-card-inner {
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    transform-style: preserve-3d;
+    margin-bottom: 12px;
+    border: 1px solid var(--borda);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+    transition: box-shadow 0.45s ease, border-color 0.45s ease;
+}
+
+.lineup-card:hover .lineup-card-inner {
+    border-color: var(--ouro);
+    box-shadow:
+        0 16px 50px rgba(0, 0, 0, 0.6),
+        0 0 30px rgba(212, 175, 55, 0.25);
+}
+
+/* Holofote vindo de cima */
+.lineup-spotlight {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    background: linear-gradient(
+        180deg,
+        rgba(252, 227, 138, 0.35) 0%,
+        rgba(212, 175, 55, 0.08) 35%,
+        transparent 60%
+    );
+    opacity: 0.6;
+    transition: opacity 0.4s ease;
+}
+
+.lineup-card:hover .lineup-spotlight {
+    opacity: 1;
+}
+
+/* Flash estilo paparazzi */
+.lineup-flash {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    pointer-events: none;
+    background: white;
+    opacity: 0;
+    mix-blend-mode: overlay;
+}
+
+.lineup-card-inner.flash-ativo .lineup-flash {
+    animation: lineupFlash 0.12s ease-out;
+}
+
+@keyframes lineupFlash {
+    0% { opacity: 0.85; }
+    100% { opacity: 0; }
+}
+
+.lineup-foto {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    background-color: rgba(212, 175, 55, 0.1);
+    background-size: cover;
+    background-position: center top;
+    position: relative;
+    z-index: 1;
+}
+
+/* Reflexo na base do card */
+.lineup-reflexo {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 45%;
+    z-index: 3;
+    pointer-events: none;
+    background: linear-gradient(to top, rgba(5, 5, 5, 0.85), transparent);
+}
+
+.lineup-card h4 {
+    font-size: 14px;
+    letter-spacing: 0.5px;
+    transition: color 0.3s ease;
+}
+
+.lineup-card:hover h4 {
+    color: var(--ouro-claro);
+}
+
+.lineup-card p {
+    font-size: 12px;
+    color: var(--texto-suave);
+}
+
+/* ===== CARTÕES GENÉRICOS (menu, vip, links) ===== */
+
+.cartao {
+    width: 100%;
+    max-width: 420px;
+    margin: 0 auto;
+    padding: 32px 26px;
+
+    background-color: var(--vidro);
+    border: 1px solid var(--borda);
+    backdrop-filter: blur(12px);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+
+    text-align: center;
+}
+
+.cartao-titulo {
+    font-family: "Bebas Neue", sans-serif;
+    font-size: 22px;
+    letter-spacing: 2px;
+    color: var(--ouro);
+    margin-bottom: 10px;
+}
+
+.cartao-texto {
+    font-size: 13px;
+    color: var(--texto-suave);
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+.btn-outline {
+    display: inline-block;
+    padding: 12px 24px;
+    border-radius: 8px;
+    border: 1px solid var(--borda);
+    color: var(--ouro-claro);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+}
+
+.btn-outline:hover {
+    background: rgba(212, 175, 55, 0.15);
+    border-color: var(--ouro);
+}
+
+/* ===== BOTÃO DE ABRIR CARDÁPIO ===== */
+
+.btn-cardapio-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    font-family: "Poppins", sans-serif;
+    cursor: pointer;
+}
+
+.btn-cardapio-icone {
+    transition: transform 0.45s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.btn-cardapio-toggle.aberto .btn-cardapio-icone {
+    transform: rotate(180deg);
+}
+
+/* ===== PAINEL EXPANSÍVEL DO CARDÁPIO ===== */
+
+.cardapio-wrapper {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.7s cubic-bezier(0.65, 0, 0.35, 1);
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.cardapio-wrapper.aberto {
+    grid-template-rows: 1fr;
+}
+
+.cardapio-inner {
+    overflow: hidden;
+    min-height: 0;
+}
+
+.cardapio-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 18px;
+    padding: 40px 20px 10px;
+    position: relative;
+}
+
+/* linha dourada que "varre" o painel quando ele abre */
+.cardapio-inner::before {
+    content: "";
+    display: block;
+    height: 1px;
+    width: 0%;
+    margin: 0 auto;
+    background: linear-gradient(90deg, transparent, var(--ouro-claro), transparent);
+    transition: width 0.9s ease 0.15s;
+}
+
+.cardapio-wrapper.aberto .cardapio-inner::before {
+    width: 100%;
+}
+
+.item-card {
+    opacity: 0;
+    transform: translateY(26px) scale(0.92) rotateX(8deg);
+    transform-origin: bottom center;
+    transition: opacity 0.55s ease, transform 0.55s cubic-bezier(0.2, 0.8, 0.2, 1);
+
+    border-radius: 14px;
+    overflow: hidden;
+    background: var(--vidro);
+    border: 1px solid var(--borda);
+    backdrop-filter: blur(8px);
+}
+
+.cardapio-grid.aberto .item-card {
+    opacity: 1;
+    transform: none;
+}
+
+/* delay em cascata — cada bloco nasce um pouco depois do anterior */
+.cardapio-grid.aberto .item-card:nth-child(1)  { transition-delay: 0.05s; }
+.cardapio-grid.aberto .item-card:nth-child(2)  { transition-delay: 0.10s; }
+.cardapio-grid.aberto .item-card:nth-child(3)  { transition-delay: 0.15s; }
+.cardapio-grid.aberto .item-card:nth-child(4)  { transition-delay: 0.20s; }
+.cardapio-grid.aberto .item-card:nth-child(5)  { transition-delay: 0.25s; }
+.cardapio-grid.aberto .item-card:nth-child(6)  { transition-delay: 0.30s; }
+.cardapio-grid.aberto .item-card:nth-child(7)  { transition-delay: 0.35s; }
+.cardapio-grid.aberto .item-card:nth-child(8)  { transition-delay: 0.40s; }
+.cardapio-grid.aberto .item-card:nth-child(9)  { transition-delay: 0.45s; }
+.cardapio-grid.aberto .item-card:nth-child(10) { transition-delay: 0.50s; }
+.cardapio-grid.aberto .item-card:nth-child(11) { transition-delay: 0.55s; }
+.cardapio-grid.aberto .item-card:nth-child(12) { transition-delay: 0.60s; }
+.cardapio-grid.aberto .item-card:nth-child(13) { transition-delay: 0.65s; }
+.cardapio-grid.aberto .item-card:nth-child(14) { transition-delay: 0.70s; }
+.cardapio-grid.aberto .item-card:nth-child(15) { transition-delay: 0.75s; }
+
+.item-foto {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    background-color: rgba(212, 175, 55, 0.1);
+    background-size: cover;
+    background-position: center;
+    transition: transform 0.5s ease;
+}
+
+.item-card:hover .item-foto {
+    transform: scale(1.08);
+}
+
+.item-info {
+    padding: 12px 10px 14px;
+    text-align: center;
+    border-top: 1px solid var(--borda);
+}
+
+.item-info h4 {
+    font-size: 12.5px;
+    font-weight: 600;
+    line-height: 1.3;
+    margin-bottom: 4px;
+}
+
+.item-preco {
+    font-size: 11px;
+    color: var(--ouro-claro);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.cartao-vip {
+    background: linear-gradient(145deg, rgba(122, 31, 61, 0.3), var(--vidro));
+}
+
+.vip-form {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.vip-form input {
+    flex: 1;
+    min-width: 160px;
+    padding: 12px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--borda);
+    background: rgba(0, 0, 0, 0.3);
+    color: white;
+    font-family: "Poppins", sans-serif;
+    font-size: 13px;
+}
+
+.vip-form input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.vip-form button {
+    padding: 12px 18px;
+    border: none;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--ouro), var(--ouro-claro));
+    color: #050505;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: filter 0.3s ease;
+}
+
+.vip-form button:hover {
+    filter: brightness(1.1);
+}
+
+.vip-confirmacao {
+    display: none;
+    margin-top: 14px;
+    font-size: 13px;
+    color: var(--ouro-claro);
+}
+
+.vip-confirmacao.mostrar {
+    display: block;
+}
+
+/* ===== ÁREA DO ATHLETICO / DIA DE JOGO ===== */
+/* --ouro, --ouro-claro, --vidro e --borda começam iguais ao resto do site
+   (dourado) e são sobrescritos localmente pelo anime.js quando a seção
+   entra na tela — todos os componentes abaixo herdam a nova cor sozinhos. */
+
+.tema-athletico {
+    position: relative;
+    isolation: isolate;
+
+    /* faz a seção sair do container central e ocupar a tela inteira,
+       criando o efeito de "faixa imersiva" separada do resto do site */
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+
+    padding: 90px 20px 100px;
+    overflow: hidden;
+    text-align: center;
+
+    /* fundo SÓLIDO E OPACO: bloqueia o brilho dourado fixo do <body>
+       para que, aqui dentro, só existam preto e vermelho */
+    background-color: #050505;
+}
+
+.tema-athletico::before,
+.tema-athletico::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--borda), transparent);
+    transition: background 1.4s ease;
+}
+
+.tema-athletico::before { top: 0; }
+.tema-athletico::after { bottom: 0; }
+
+.athletico-fundo {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+        radial-gradient(circle at 20% 10%, var(--ouro), transparent 50%),
+        radial-gradient(circle at 85% 90%, var(--ouro-claro), transparent 45%),
+        #050505;
+    opacity: 0.32;
+    filter: blur(20px);
+    transition: opacity 1.2s ease;
+}
+
+.athletico-conteudo {
+    position: relative;
+    z-index: 1;
+    max-width: 620px;
+    margin: 0 auto;
+}
+
+.athletico-brasao {
+    margin-bottom: 14px;
+}
+
+.athletico-brasao path,
+.athletico-brasao circle {
+    transition: stroke 1.4s ease;
+}
+
+.athletico-eyebrow {
+    color: var(--ouro-claro);
+    transition: color 1.4s ease;
+}
+
+.athletico-titulo {
+    color: var(--ouro);
+    transition: color 1.4s ease;
+}
+
+.athletico-sub {
+    max-width: 520px;
+    margin: 0 auto 8px;
+    font-size: 13.5px;
+    line-height: 1.7;
+    color: var(--texto-suave);
+}
+
+.athletico-card {
+    max-width: 440px;
+    margin: 28px auto 0;
+    padding: 30px 24px;
+
+    background: var(--vidro);
+    border: 1px solid var(--borda);
+    border-radius: 18px;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 12px 34px rgba(0, 0, 0, 0.55);
+
+    transition: background 1.4s ease, border-color 1.4s ease;
+}
+
+.athletico-selo {
+    transition: background 1.4s ease;
+}
+
+.athletico-tag {
+    font-size: 13px;
+}
+
+.athletico-btn {
+    margin-top: 22px;
+    display: inline-block;
+}
+
+/* ===== INFO (localização, horário, dress code) ===== */
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 18px;
+    margin-bottom: 26px;
+}
+
+.info-card {
+    background: var(--vidro);
+    border: 1px solid var(--borda);
+    border-radius: 14px;
+    padding: 22px;
+    backdrop-filter: blur(10px);
+}
+
+.info-card h4 {
+    font-size: 15px;
+    margin-bottom: 8px;
+}
+
+.info-card p {
+    font-size: 13px;
+    color: var(--texto-suave);
+    line-height: 1.5;
+}
+
+.info-sub {
+    font-size: 12px;
+    opacity: 0.7;
+    margin-top: 2px;
+}
+
+.link-seta {
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 12px;
+    color: var(--ouro-claro);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.mapa-embed {
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid var(--borda);
+    filter: grayscale(0.3) contrast(1.1);
+}
+
+/* ===== DEPOIMENTOS ===== */
+
+.depoimentos-carrossel {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 18px;
+}
+
+.depoimento-card {
+    background: var(--vidro);
+    border: 1px solid var(--borda);
+    border-radius: 14px;
+    padding: 24px;
+}
+
+.depoimento-texto {
+    font-family: "Cormorant Garamond", serif;
+    font-style: italic;
+    font-size: 16px;
+    line-height: 1.5;
+    margin-bottom: 12px;
+}
+
+.depoimento-autor {
+    font-size: 12px;
+    color: var(--ouro-claro);
+}
+
+/* ===== LISTA DE LINKS ===== */
+
+.links-lista {
+    list-style: none;
+    width: 100%;
+}
+
+.links-lista li {
+    margin: 12px 0;
+}
+
+.links-lista a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    text-align: center;
+    text-decoration: none;
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: 0.5px;
+
+    background-color: rgba(212, 175, 55, 0.12);
+    border: 1px solid var(--borda);
+    padding: 13px 0;
+    border-radius: 8px;
+    transition: all 0.35s ease;
+}
+
+.links-lista a:hover {
+    background-color: rgba(212, 175, 55, 0.9);
+    color: #050505;
+    border-color: var(--ouro);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(212, 175, 55, 0.4);
+}
+
+/* ===== RODAPÉ ===== */
+
+.rodape {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 40px 20px 120px;
+    font-size: 12px;
+    color: var(--texto-suave);
+}
+
+.rodape-sub {
+    margin-top: 4px;
+    opacity: 0.6;
+    font-size: 11px;
+}
+
+/* ===== BOTÕES FIXOS (flutuantes) ===== */
+
+.btn-flutuante {
+    position: fixed;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+    transition: transform 0.3s ease;
+}
+
+.btn-flutuante:hover {
+    transform: scale(1.06);
+}
+
+.btn-ingresso {
+    left: 50%;
+    bottom: 24px;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, var(--ouro), var(--ouro-claro));
+    color: #050505;
+    font-weight: 700;
+    font-family: "Poppins", sans-serif;
+    font-size: 13px;
+    padding: 15px 28px;
+    border-radius: 50px;
+    box-shadow: 0 6px 24px rgba(212, 175, 55, 0.45);
+    animation: pulso 2.5s infinite;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.4s ease, visibility 0.4s ease, transform 0.3s ease;
+    will-change: transform;
+}
+
+.btn-ingresso.visivel {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+.btn-ingresso:hover {
+    transform: translateX(-50%) scale(1.06);
+}
+
+/* Halo de glow atrás do botão */
+.btn-ingresso-glow {
+    position: absolute;
+    inset: -8px;
+    border-radius: 50px;
+    background: radial-gradient(circle, rgba(212, 175, 55, 0.5), transparent 70%);
+    z-index: -1;
+    opacity: 0.6;
+    animation: ingressoGlow 3s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes ingressoGlow {
+    0%, 100% { opacity: 0.4; transform: scale(1); }
+    50% { opacity: 0.75; transform: scale(1.08); }
+}
+
+.btn-ingresso-icone {
+    font-size: 16px;
+    line-height: 1;
+}
+
+@keyframes pulso {
+    0% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.5); }
+    70% { box-shadow: 0 0 0 14px rgba(212, 175, 55, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); }
+}
+
+.btn-whatsapp {
+    bottom: 24px;
+    left: 24px;
+    width: 52px;
+    height: 52px;
+    justify-content: center;
+    background: #25D366;
+    color: white;
+    border-radius: 50%;
+}
+
+/* =========================================================
+   🎬 BLACKOUT — ABERTURA CINEMATOGRÁFICA
+   Tela preta que cobre tudo ao carregar. O JS remove a
+   classe .blackout-ativo para revelar o conteúdo com fade.
+   ========================================================= */
+
+.blackout {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    background: #000;
+    pointer-events: none;
+    opacity: 1;
+    visibility: visible;
+    transition:
+        opacity 1.2s cubic-bezier(0.65, 0, 0.35, 1),
+        visibility 0s 0s;
+}
+
+.blackout.blackout--revelar {
+    opacity: 0;
+    visibility: hidden;
+    transition:
+        opacity 1.2s cubic-bezier(0.65, 0, 0.35, 1),
+        visibility 0s 1.2s;
+}
+
+.blackout.blackout--revelar ~ * {
+    animation: revelarConteudo 1.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes revelarConteudo {
+    0% {
+        filter: blur(8px);
+        opacity: 0;
+    }
+    100% {
+        filter: blur(0);
+        opacity: 1;
+    }
+}
+
+/* =========================================================
+   📷 CÂMERA — EFEITOS CINEMATOGRÁFICOS
+   Lens flare, vinheta, profundidade, perspectiva.
+   ========================================================= */
+
+.camera-efeitos {
+    position: fixed;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.camera-lens {
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(
+            circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+            transparent 0%,
+            rgba(212, 175, 55, 0.03) 25%,
+            transparent 50%
+        );
+    transition: background 0.3s ease;
+}
+
+.camera-vignette {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+        ellipse at center,
+        transparent 50%,
+        rgba(5, 5, 5, 0.5) 85%,
+        rgba(5, 5, 5, 0.8) 100%
+    );
+}
+
+/* Profundidade de cena — escala + blur */
+[data-cena] {
+    position: relative;
+    perspective: 1000px;
+    perspective-origin: center top;
+}
+
+.cena-profunda {
+    transform: scale(0.92) translateZ(-40px);
+    opacity: 0.6;
+    filter: blur(3px);
+    transition:
+        transform 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+        opacity 0.8s ease,
+        filter 0.8s ease;
+}
+
+.cena-próxima {
+    transform: scale(1.02) translateZ(10px);
+    opacity: 1;
+    filter: blur(0);
+    transition:
+        transform 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+        opacity 0.8s ease,
+        filter 0.8s ease;
+}
+
+/* =========================================================
+   ✨ GOLD LUXURY — REFLEXOS, GLOW E ILUMINAÇÃO
+   Efeitos premium dourados para botões, títulos e cards.
+   ========================================================= */
+
+/* Glow pulsante em elementos dourados */
+.glow-luxo {
+    animation: glowLuxo 3s ease-in-out infinite;
+}
+
+@keyframes glowLuxo {
+    0%, 100% {
+        box-shadow:
+            0 0 20px rgba(212, 175, 55, 0.2),
+            0 0 40px rgba(212, 175, 55, 0.1);
+    }
+    50% {
+        box-shadow:
+            0 0 30px rgba(212, 175, 55, 0.4),
+            0 0 60px rgba(212, 175, 55, 0.2),
+            0 0 80px rgba(212, 175, 55, 0.1);
+    }
+}
+
+/* Reflexo dourado em cards — barra brilhante que passa */
+.reflexo-dourado {
+    position: relative;
+    overflow: hidden;
+}
+
+.reflexo-dourado::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(252, 227, 138, 0.15),
+        transparent
+    );
+    transform: skewX(-25deg);
+    animation: reflexoBrilho 4s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes reflexoBrilho {
+    0%, 100% { left: -100%; }
+    50% { left: 200%; }
+}
+
+/* Texto com gradiente dourado animado */
+.texto-dourado-animado {
+    background: linear-gradient(
+        90deg,
+        var(--ouro),
+        var(--ouro-claro),
+        var(--ouro),
+        var(--vinho),
+        var(--ouro)
+    );
+    background-size: 300% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: gradienteAnimado 8s ease-in-out infinite;
+}
+
+@keyframes gradienteAnimado {
+    0%, 100% { background-position: 0% center; }
+    50% { background-position: 100% center; }
+}
+
+/* Brilho estático em bordas */
+.borda-brilho {
+    border-image: linear-gradient(
+        135deg,
+        var(--ouro),
+        var(--ouro-claro),
+        var(--ouro)
+    ) 1;
+}
+
+/* ===== PARTÍCULAS PREMIUM ===== */
+
+.particula-premium {
+    position: absolute;
+    bottom: -10px;
+    pointer-events: none;
+    will-change: transform, opacity;
+}
+
+.particula-premium--ouro {
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: var(--ouro-claro);
+    box-shadow: 0 0 6px rgba(252, 227, 138, 0.6);
+}
+
+.particula-premium--estrela {
+    clip-path: polygon(
+        50% 0%, 61% 35%, 98% 35%,
+        68% 57%, 79% 91%, 50% 70%,
+        21% 91%, 32% 57%, 2% 35%, 39% 35%
+    );
+    background: var(--ouro);
+    width: 6px;
+    height: 6px;
+}
+
+.particula-premium--vinho {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--vinho);
+    box-shadow: 0 0 8px rgba(122, 31, 61, 0.5);
+}
+
+/* =========================================================
+   🃏 CARDS VIP — GLASSMORPHISM PREMIUM
+   ========================================================= */
+
+.cartao-vip-premium {
+    position: relative;
+    overflow: hidden;
+
+    background: linear-gradient(
+        145deg,
+        rgba(122, 31, 61, 0.25),
+        rgba(212, 175, 55, 0.08)
+    );
+    backdrop-filter: var(--vidro-blur-forte, blur(20px));
+    -webkit-backdrop-filter: var(--vidro-blur-forte, blur(20px));
+    border: 1px solid var(--borda);
+    border-radius: var(--vidro-radius, 16px);
+
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+
+    transition:
+        transform 0.4s cubic-bezier(0.65, 0, 0.35, 1),
+        box-shadow 0.4s ease;
+}
+
+.cartao-vip-premium:hover {
+    transform: translateY(-4px) scale(1.01);
+    box-shadow:
+        0 16px 48px rgba(0, 0, 0, 0.6),
+        0 0 30px rgba(212, 175, 55, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+/* Borda dourada degradê animada */
+.cartao-vip-premium::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(
+        135deg,
+        var(--ouro),
+        transparent 30%,
+        transparent 70%,
+        var(--ouro-claro)
+    );
+    -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+    mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0.6;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+}
+
+.cartao-vip-premium:hover::before {
+    opacity: 1;
+}
+
+/* Profundidade no hover */
+.cartao-vip-premium::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    box-shadow:
+        inset 0 2px 20px rgba(212, 175, 55, 0.05);
+    pointer-events: none;
+    transition: box-shadow 0.4s ease;
+}
+
+.cartao-vip-premium:hover::after {
+    box-shadow:
+        inset 0 2px 30px rgba(212, 175, 55, 0.1);
+}
+
+/* =========================================================
+   🔴 ATHLETICO THEME — TRANSIÇÃO DOURADO → VERMELHO
+   Classe .tema-athletico-ativo aplicada pelo ScrollTrigger
+   ao entrar na seção. Sobrescreve as variáveis de cor.
+   ========================================================= */
+
+/* Estado D'Five (padrão) — preto + dourado */
+.tema-athletico-ativo {
+    --ouro: var(--rubro) !important;
+    --ouro-claro: var(--rubro-claro) !important;
+    --vidro: var(--rubro-vidro) !important;
+    --borda: var(--rubro-borda) !important;
+}
+
+/* Efeito de estádio — textura sutil */
+.tema-athletico-ativo .athletico-fundo {
+    background:
+        radial-gradient(circle at 20% 10%, var(--rubro), transparent 50%),
+        radial-gradient(circle at 85% 90%, var(--rubro-claro), transparent 45%),
+        #050505;
+    opacity: 0.45;
+}
+
+.tema-athletico-ativo .athletico-card {
+    border-color: var(--rubro-borda);
+    background: var(--rubro-vidro);
+    box-shadow:
+        0 12px 34px rgba(0, 0, 0, 0.55),
+        0 0 30px rgba(225, 6, 0, 0.15);
+}
+
+.tema-athletico-ativo .athletico-brasao path,
+.tema-athletico-ativo .athletico-brasao circle {
+    stroke: var(--rubro-claro);
+}
+
+.tema-athletico-ativo .athletico-btn {
+    background: linear-gradient(135deg, var(--rubro), var(--rubro-claro));
+    box-shadow: 0 8px 24px rgba(225, 6, 0, 0.35);
+}
+
+.tema-athletico-ativo .athletico-btn:hover {
+    box-shadow: 0 12px 30px rgba(225, 6, 0, 0.5);
+}
+
+/* Granulação de "filme antigo" na seção */
+.tema-athletico .athletico-granulado {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.15'/%3E%3C/svg%3E");
+    background-size: 256px 256px;
+    transition: opacity 1.4s ease;
+}
+
+.tema-athletico-ativo .athletico-granulado {
+    opacity: 0.6;
+}
+
+/* =========================================================
+   🥚 EASTER EGG — MODO SECRETO VIP
+   Ativado com 5 cliques no logo D'FIVE
+   ========================================================= */
+
+.easter-egg-container {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    /* Sem transition — GSAP controla completamente */
+}
+
+.easter-egg-overlay {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+        ellipse at center,
+        transparent 30%,
+        rgba(212, 175, 55, 0.08) 60%,
+        rgba(5, 5, 5, 0.9) 100%
+    );
+}
+
+.easter-egg-conteudo {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+.easter-egg-texto {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 42px;
+    letter-spacing: 8px;
+    color: var(--ouro-claro);
+    text-shadow:
+        0 0 20px rgba(212, 175, 55, 0.5),
+        0 0 40px rgba(212, 175, 55, 0.3),
+        0 0 80px rgba(212, 175, 55, 0.1);
+    /* Sem transition — GSAP controla completamente */
+}
+
+/* Confete dourado */
+.easter-confete {
+    position: fixed;
+    width: 8px;
+    height: 8px;
+    pointer-events: none;
+    z-index: 10001;
+}
+
+/* Evento de clique no logo */
+.nav-logo[data-click-easter] {
+    cursor: pointer;
+}
+
+/* =========================================================
+   🎬 TRANSIÇÃO DE CENA — WIPE CINEMATOGRÁFICO
+   ========================================================= */
+
+.transicao-cena {
+    position: fixed;
+    inset: 0;
+    z-index: 9998;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transition:
+        opacity 0.3s ease,
+        visibility 0s 0.5s;
+}
+
+.transicao-cena.ativo {
+    opacity: 1;
+    visibility: visible;
+    transition:
+        opacity 0.2s ease,
+        visibility 0s 0s;
+}
+
+.transicao-cena-top,
+.transicao-cena-bottom {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 50%;
+    background: #050505;
+    transition: transform 0.8s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.transicao-cena-top {
+    top: 0;
+    transform: translateY(-100%);
+}
+
+.transicao-cena-bottom {
+    bottom: 0;
+    transform: translateY(100%);
+}
+
+.transicao-cena.ativo .transicao-cena-top {
+    transform: translateY(0);
+}
+
+.transicao-cena.ativo .transicao-cena-bottom {
+    transform: translateY(0);
+}
+
+/* =========================================================
+   📊 BARRA DE PROGRESSO CINEMATOGRÁFICA
+   ========================================================= */
+
+.progresso-cena {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    z-index: 999;
+    background: rgba(255, 255, 255, 0.03);
+    pointer-events: none;
+}
+
+.progresso-cena-preenchimento {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(
+        90deg,
+        var(--ouro),
+        var(--ouro-claro),
+        var(--ouro)
+    );
+    background-size: 200% auto;
+    animation: progressoBrilho 3s linear infinite;
+    transition: width 0.1s linear;
+}
+
+@keyframes progressoBrilho {
+    0%, 100% { background-position: 0% center; }
+    50% { background-position: 100% center; }
+}
+
+.progresso-cena-marcadores {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    display: flex;
+    justify-content: space-around;
+}
+
+.progresso-cena-marcadores span {
+    width: 1px;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.08);
+    transition:
+        background 0.4s ease,
+        box-shadow 0.4s ease;
+}
+
+.progresso-cena-marcadores span.ativo {
+    background: var(--ouro-claro);
+    box-shadow: 0 0 8px var(--ouro);
+}
+
+/* =========================================================
+   📝 LEGENDA DE CENA
+   ========================================================= */
+
+.legenda-cena {
+    position: fixed;
+    bottom: 100px;
+    right: 24px;
+    z-index: 100;
+    text-align: right;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.6s ease;
+}
+
+.legenda-cena-titulo {
+    display: block;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 14px;
+    letter-spacing: 3px;
+    color: var(--ouro-claro);
+    text-transform: uppercase;
+    text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+}
+
+.legenda-cena-sub {
+    display: block;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: rgba(255, 255, 255, 0.4);
+    text-transform: uppercase;
+    text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+    margin-top: 2px;
+}
+
+/* =========================================================
+   💫 MICRO-INTERAÇÕES E DETALHES
+   ========================================================= */
+
+/* Onda expansiva no clique dos botões */
+.btn-onda {
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-onda::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(
+        circle at var(--onda-x, 50%) var(--onda-y, 50%),
+        rgba(255, 255, 255, 0.3) 0%,
+        transparent 70%
+    );
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.btn-onda:active::after {
+    opacity: 1;
+    transition: opacity 0s;
+}
+
+/* =========================================================
+   📱 RESPONSIVO — MOBILE FIRST
+   Garantir: 320px · 360px · 375px · 390px · 414px · 768px · 1024px · 1440px
+   ========================================================= */
+
+/* 320px — Dispositivos muito pequenos */
+@media (min-width: 320px) {
+    .hero h1 { font-size: clamp(36px, 10vw, 48px); letter-spacing: 4px; }
+    .hero { padding: 60px 14px 40px; min-height: 80vh; }
+    .secao { padding: 30px 14px; }
+    .contagem { gap: 6px; }
+    .contagem-item { min-width: 42px; padding: 6px 8px; }
+    .contagem-item span { font-size: 18px; }
+    .contagem-item small { font-size: 8px; }
+    .legenda-cena { display: none; }
+    .progresso-cena { height: 2px; }
+    .ingresso-card { flex-direction: column; }
+    .ingresso-btn { width: 100%; padding: 12px; }
+    .ingresso-picote { display: none; }
+    .lineup-grid { grid-template-columns: 1fr; }
+    .destaque { padding: 24px 16px; }
+    .destaque-titulo { font-size: 28px; }
+    .video-card { width: 180px; height: 320px; }
+}
+
+/* 360px */
+@media (min-width: 360px) {
+    .hero h1 { font-size: clamp(42px, 11vw, 56px); }
+    .lineup-grid { grid-template-columns: repeat(2, 1fr); }
+    .ingresso-card { flex-direction: row; }
+    .ingresso-btn { width: 80px; }
+    .ingresso-picote { display: block; }
+}
+
+/* 375px — iPhone SE / small devices */
+@media (min-width: 375px) {
+    .hero { padding: 70px 16px 40px; }
+    .contagem { gap: 8px; }
+    .contagem-item { min-width: 48px; padding: 8px 10px; }
+    .contagem-item span { font-size: 20px; }
+    .nav-fixa-inner { height: 56px; }
+    .secao { padding: 36px 16px; }
+}
+
+/* 390px — iPhone 12/13/14 */
+@media (min-width: 390px) {
+    .hero h1 { font-size: clamp(48px, 12vw, 64px); }
+    .lineup-grid { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); }
+    .cardapio-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* 414px — iPhone Plus / Max */
+@media (min-width: 414px) {
+    .hero { min-height: 82vh; }
+    .contagem { gap: 10px; }
+    .contagem-item { min-width: 52px; padding: 10px 12px; }
+    .secao-titulo { font-size: 24px; }
+}
+
+/* 768px — Tablets */
+@media (min-width: 768px) {
+    .hero h1 { font-size: clamp(64px, 10vw, 80px); letter-spacing: 8px; }
+    .hero h2 { font-size: clamp(18px, 2.5vw, 22px); }
+    .hero { padding: 80px 32px 50px; min-height: 85vh; }
+    .nav-fixa-inner { height: 72px; padding: 0 32px; }
+    .nav-logo { font-size: 22px; }
+    .secao { padding: 50px 32px; }
+    .secao-titulo { font-size: 28px; letter-spacing: 4px; }
+    .lineup-grid { grid-template-columns: repeat(3, 1fr); }
+    .cardapio-grid { grid-template-columns: repeat(3, 1fr); }
+    .legenda-cena { display: block; }
+    .ingressos-grid { grid-template-columns: repeat(2, 1fr); }
+    .video-card { width: 220px; height: 380px; }
+    .camera-vignette {
+        background: radial-gradient(
+            ellipse at center,
+            transparent 55%,
+            rgba(5, 5, 5, 0.4) 85%,
+            rgba(5, 5, 5, 0.7) 100%
+        );
+    }
+}
+
+/* 1024px — Tablets grandes / Notebooks */
+@media (min-width: 1024px) {
+    .hero h1 { font-size: clamp(72px, 8vw, 84px); }
+    .main { max-width: 960px; }
+    .ingressos-grid { grid-template-columns: repeat(3, 1fr); }
+    .cardapio-grid { grid-template-columns: repeat(4, 1fr); }
+    .info-grid { grid-template-columns: repeat(3, 1fr); }
+    .depoimentos-carrossel { grid-template-columns: repeat(3, 1fr); }
+    .secao { padding: 60px 40px; }
+    .legenda-cena { bottom: 120px; right: 32px; }
+}
+
+/* 1440px — Desktop Full HD */
+@media (min-width: 1440px) {
+    main { max-width: 1100px; }
+    .hero h1 { font-size: 96px; letter-spacing: 12px; }
+    .hero { min-height: 90vh; }
+    .secao { padding: 80px 0; }
+    .destaque { max-width: 520px; padding: 40px 28px; }
+    .contagem-item { min-width: 64px; padding: 12px 16px; }
+    .contagem-item span { font-size: 28px; }
+    .legenda-cena { bottom: 140px; right: 40px; }
+    .camera-vignette {
+        background: radial-gradient(
+            ellipse at center,
+            transparent 60%,
+            rgba(5, 5, 5, 0.35) 85%,
+            rgba(5, 5, 5, 0.65) 100%
+        );
+    }
+}
+
+/* ===== RESPONSIVO EXISTENTE ===== */
+
+@media (max-width: 480px) {
+    .btn-ingresso span:not(.btn-ingresso-glow):not(.btn-ingresso-icone) { display: inline; }
+    .btn-ingresso { padding: 14px 22px; font-size: 12px; bottom: 20px; }
+    .hero { padding-top: 60px; min-height: 80vh; }
+    .contagem { gap: 8px; }
+    .contagem-item { min-width: 48px; padding: 8px 10px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hero-glow,
+    .hero-rays,
+    .lineup-flash,
+    .btn-ingresso-glow { animation: none !important; }
+    .btn-ingresso { animation: none !important; }
+}

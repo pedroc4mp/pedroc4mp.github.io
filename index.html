@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D'Five — Arena Lounge</title>
+    <meta name="description" content="D'Five Arena Lounge. Ingressos, eventos, localização e tudo sobre a casa em um só lugar.">
+
+    <!-- Open Graph: prévia bonita ao compartilhar no WhatsApp/Instagram -->
+    <meta property="og:title" content="D'Five — Arena Lounge">
+    <meta property="og:description" content="Ingressos, eventos e localização. Tudo sobre a D'Five em um só lugar.">
+    <meta property="og:image" content="img/og-cover.jpg">
+    <meta property="og:type" content="website">
+
+    <link rel="icon" type="image/png" href="img/favicon.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@400;500;600;700;800&family=Cormorant+Garamond:ital@1&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css">
+</head>
+<body>
+
+    <!-- ===== BLACKOUT INICIAL (abertura cinematográfica) ===== -->
+    <div class="blackout" id="blackout" aria-hidden="true"></div>
+
+    <!-- ===== EFEITOS DE CÂMERA (lens flare, vignette, profundidade) ===== -->
+    <div class="camera-efeitos" id="cameraEfeitos" aria-hidden="true">
+        <div class="camera-lens" id="cameraLens"></div>
+        <div class="camera-vignette" id="cameraVignette"></div>
+    </div>
+
+    <!-- ===== BARRA DE PROGRESSO CINEMATOGRÁFICA ===== -->
+    <div class="progresso-cena" id="progressoCena" aria-hidden="true">
+        <div class="progresso-cena-preenchimento" id="progressoPreenchimento"></div>
+        <div class="progresso-cena-marcadores" id="progressoMarcadores">
+            <span data-cena-alvo="hero" class="ativo"></span>
+            <span data-cena-alvo="eventos"></span>
+            <span data-cena-alvo="lineup"></span>
+            <span data-cena-alvo="cardapio"></span>
+            <span data-cena-alvo="athletico"></span>
+            <span data-cena-alvo="vip"></span>
+        </div>
+    </div>
+
+    <!-- ===== HEADER FIXO (NAV) ===== -->
+    <!-- Transparente sobre a Hero. Ganha fundo em vidro (blur) assim que o
+         usuário ultrapassa a Hero, via GSAP ScrollTrigger. O menu abre em
+         overlay fullscreen com entrada em fade + stagger pelo anime.js.
+         Ver função iniciarHeaderFixo() em script.js. -->
+    <nav class="nav-fixa" id="navFixa" aria-label="Navegação principal">
+        <div class="nav-fixa-inner">
+            <a href="#" class="nav-logo" id="logoDfive" data-click-easter="0" aria-label="D'Five — clique 5 vezes para o modo secreto">D'FIVE</a>
+
+            <button type="button" class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="navOverlay" aria-label="Abrir menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="nav-overlay" id="navOverlay">
+        <ul class="nav-overlay-links">
+            <li><a href="#eventos">Eventos</a></li>
+            <li><a href="#lineup">Line-up</a></li>
+            <li><a href="#cardapio">Cardápio</a></li>
+            <li><a href="#athletico">Dia de Jogo</a></li>
+            <li><a href="#localizacao">Localização</a></li>
+            <li><a href="#vip">Lista VIP</a></li>
+        </ul>
+        <a href="https://wa.me/5541999999999" target="_blank" class="nav-overlay-whats">Falar no WhatsApp</a>
+    </div>
+
+    <!-- ===== PARTÍCULAS DE FUNDO ===== -->
+    <div class="particulas" id="particulas"></div>
+
+    <!-- ===== OVERLAY DE TRANSIÇÃO ENTRE CENAS (efeito cinematográfico) ===== -->
+    <div class="transicao-cena" id="transicaoCena" aria-hidden="true">
+        <div class="transicao-cena-top"></div>
+        <div class="transicao-cena-bottom"></div>
+    </div>
+
+    <!-- ===== LEGENDA DE CENA (canto inferior direito) ===== -->
+    <div class="legenda-cena" id="legendaCena" aria-live="polite" aria-hidden="true">
+        <span class="legenda-cena-titulo">D'Five Arena Lounge</span>
+        <span class="legenda-cena-sub">Abertura</span>
+    </div>
+
+    <!-- ===== HERO ===== -->
+    <header class="hero" data-cena="hero">
+        <div class="hero-atmosfera" aria-hidden="true">
+            <div class="hero-glow hero-glow--1"></div>
+            <div class="hero-glow hero-glow--2"></div>
+            <div class="hero-glow hero-glow--3"></div>
+            <div class="hero-rays"></div>
+        </div>
+
+        <p class="hero-eyebrow">Curitiba · Arena Lounge</p>
+        <h1>D'FIVE</h1>
+        <h2>O lounge bar mais completo de Curitiba.</h2>
+
+        <div class="hero-cta">
+            <a href="#eventos" class="btn-primario">Ver próximos eventos</a>
+            <a href="https://wa.me/5541999999999" target="_blank" class="btn-secundario">Reservar mesa</a>
+        </div>
+
+        <a href="#eventos" class="scroll-hint" aria-label="Rolar para eventos">
+            <span></span>
+        </a>
+    </header>
+
+    <main>
+
+        <!-- ===== PRÓXIMO EVENTO EM DESTAQUE ===== -->
+        <section class="destaque reveal">
+            <div class="destaque-selo">Próxima edição</div>
+            <h3 class="destaque-titulo">Noite Dourada</h3>
+            <p class="destaque-data">Sábado, 09 de Agosto · 23h</p>
+            <div class="contagem" id="contagem">
+                <div class="contagem-item"><span id="dias">00</span><small>dias</small></div>
+                <div class="contagem-item"><span id="horas">00</span><small>horas</small></div>
+                <div class="contagem-item"><span id="minutos">00</span><small>min</small></div>
+                <div class="contagem-item"><span id="segundos">00</span><small>seg</small></div>
+            </div>
+            <p class="vagas-restantes">🔥 Últimas mesas disponíveis</p>
+        </section>
+
+        <!-- ===== PRÓXIMOS EVENTOS ===== -->
+        <section class="secao" id="eventos" data-cena="eventos">
+            <h3 class="secao-titulo">Próximos Eventos</h3>
+
+            <div class="ingressos-grid reveal">
+                <article class="ingresso-card">
+                    <div class="ingresso-corpo">
+                        <span class="ingresso-mes">AGO</span>
+                        <span class="ingresso-dia">09</span>
+                        <div class="ingresso-info">
+                            <h4>Noite Dourada</h4>
+                            <p>DJ Marcos Lyra · 23h</p>
+                        </div>
+                    </div>
+                    <div class="ingresso-picote"></div>
+                    <a href="#" class="ingresso-btn">Comprar</a>
+                </article>
+
+                <article class="ingresso-card">
+                    <div class="ingresso-corpo">
+                        <span class="ingresso-mes">AGO</span>
+                        <span class="ingresso-dia">16</span>
+                        <div class="ingresso-info">
+                            <h4>Sunset Session</h4>
+                            <p>Line-up especial · 22h</p>
+                        </div>
+                    </div>
+                    <div class="ingresso-picote"></div>
+                    <a href="#" class="ingresso-btn">Comprar</a>
+                </article>
+
+                <article class="ingresso-card">
+                    <div class="ingresso-corpo">
+                        <span class="ingresso-mes">AGO</span>
+                        <span class="ingresso-dia">23</span>
+                        <div class="ingresso-info">
+                            <h4>Closed Room</h4>
+                            <p>Evento fechado · 23h</p>
+                        </div>
+                    </div>
+                    <div class="ingresso-picote"></div>
+                    <a href="#" class="ingresso-btn">Comprar</a>
+                </article>
+            </div>
+        </section>
+
+        <!-- ===== GALERIA DE VÍDEOS ===== -->
+        <section class="secao reveal">
+            <h3 class="secao-titulo">O Ambiente</h3>
+
+            <div class="video-carrossel" id="carrossel">
+                <div class="video-card">
+                    <video src="img/compress/baladaroxa.mp4" muted loop playsinline autoplay></video>
+                </div>
+                <div class="video-card">
+                    <video src="img/compress/dj.mp4" muted loop playsinline autoplay></video>
+                </div>
+                <div class="video-card">
+                    <video src="img/compress/pessoasdançando.mp4" muted loop playsinline autoplay></video>
+                </div>
+                <div class="video-card">
+                    <video src="img/compress/baladaroxa.mp4" muted loop playsinline autoplay></video>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== LINE-UP ===== -->
+        <section class="secao reveal" id="lineup" data-cena="lineup">
+            <h3 class="secao-titulo">Line-up</h3>
+            <div class="lineup-grid">
+                <article class="lineup-card" data-aos="fade-up" data-aos-delay="0">
+                    <div class="lineup-card-inner">
+                        <div class="lineup-spotlight" aria-hidden="true"></div>
+                        <div class="lineup-flash" aria-hidden="true"></div>
+                        <div class="lineup-foto" style="background-image:url('img/compress/mc gp.webp')"></div>
+                        <div class="lineup-reflexo" aria-hidden="true"></div>
+                    </div>
+                    <h4>MC GP</h4>
+                    <p>Funk</p>
+                </article>
+                <article class="lineup-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="lineup-card-inner">
+                        <div class="lineup-spotlight" aria-hidden="true"></div>
+                        <div class="lineup-flash" aria-hidden="true"></div>
+                        <div class="lineup-foto" style="background-image:url('img/compress/MC Ryan SP.webp')"></div>
+                        <div class="lineup-reflexo" aria-hidden="true"></div>
+                    </div>
+                    <h4>MC Ryan SP</h4>
+                    <p>Funk</p>
+                </article>
+                <article class="lineup-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="lineup-card-inner">
+                        <div class="lineup-spotlight" aria-hidden="true"></div>
+                        <div class="lineup-flash" aria-hidden="true"></div>
+                        <div class="lineup-foto" style="background-image:url('img/compress/mc gp.webp')"></div>
+                        <div class="lineup-reflexo" aria-hidden="true"></div>
+                    </div>
+                    <h4>MC GP</h4>
+                    <p>Funk</p>
+                </article>
+            </div>
+        </section>
+
+        <!-- ===== MENU / CARDÁPIO ===== -->
+        <section class="secao reveal" id="cardapio" data-cena="cardapio">
+            <div class="cartao cartao-menu">
+                <h3 class="cartao-titulo">Cardápio</h3>
+                <p class="cartao-texto">Drinks autorais, rótulos selecionados e coquetelaria de bar premiado.</p>
+                <button type="button" class="btn-outline btn-cardapio-toggle" id="btnCardapio" aria-expanded="false" aria-controls="cardapioWrapper">
+                    <span class="btn-cardapio-texto">Ver cardápio completo</span>
+                    <svg class="btn-cardapio-icone" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+            </div>
+
+            <div class="cardapio-wrapper" id="cardapioWrapper">
+                <div class="cardapio-inner">
+                    <div class="cardapio-grid" id="cardapioGrid">
+
+                        <div class="item-card">
+                            <div class="item-foto" style="background-image:url('img/compress/43lemonade.webp')"></div>
+                            <div class="item-info">
+                                <h4>43 Lemonade</h4>
+                            </div>
+                        </div>
+
+                        <div class="item-card">
+                            <div class="item-foto" style="background-image:url('img/compress/caipirinha.webp')"></div>
+                            <div class="item-info">
+                                <h4>Caipirinha</h4>
+                            </div>
+                        </div>
+
+                        <div class="item-card">
+                            <div class="item-foto" style="background-image:url('img/compress/mojito.webp')"></div>
+                            <div class="item-info">
+                                <h4>Mojito</h4>
+                            </div>
+                        </div>
+
+                        <div class="item-card">
+                            <div class="item-foto" style="background-image:url('img/compress/moscowmule.webp')"></div>
+                            <div class="item-info">
+                                <h4>Moscow Mule</h4>
+                            </div>
+                        </div>
+
+                        <div class="item-card">
+                            <div class="item-foto" style="background-image:url('img/compress/negroni.webp')"></div>
+                            <div class="item-info">
+                                <h4>Negroni</h4>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== ÁREA DO ATHLETICO / DIA DE JOGO ===== -->
+        <!-- As variáveis de cor (--ouro, --ouro-claro, --vidro, --borda) são
+             sobrescritas localmente nesta seção via JS (anime.js) quando ela
+             entra na tela — por isso todo elemento dourado do resto do site
+             (botões, bordas, textos) vira vermelho/preto aqui automaticamente.
+             O fundo é opaco de propósito: impede que o brilho dourado fixo
+             do body vaze por trás e misture as cores da D'Five com as do clube. -->
+        <section class="tema-athletico reveal" id="athletico" data-cena="athletico">
+            <div class="athletico-fundo" aria-hidden="true"></div>
+
+            <div class="athletico-conteudo">
+                <img src="img/outros/cap2.png" alt="Athletico Paranaense" class="athletico-brasao" id="athleticoBrasao" data-cena-entrada>
+
+                <p class="hero-eyebrow athletico-eyebrow">Athletico Paranaense</p>
+                <h3 class="secao-titulo athletico-titulo">Dia de Jogo</h3>
+                <p class="athletico-sub">Em frente do estádio do Athletico Paranaense. Aqui na D'Five os jogos passam ao vivo no telão, com ambiente de arena e petiscos pra torcida toda.</p>
+                <div class="athletico-card">
+                    <div class="destaque-selo athletico-selo">Próximo jogo</div>
+                    <h4 class="destaque-titulo" id="athleticoOpponent">Athletico</h4>
+                    <p class="destaque-data" id="athleticoInfo">Consulte nossa agenda</p>
+                    <a href="https://wa.me/5541999999999" target="_blank" class="btn-primario athletico-btn" id="athleticoReservaBtn">Reservar mesa pro jogo</a>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ===== SOBRE / INFORMAÇÕES ===== -->
+        <section class="secao reveal" id="localizacao">
+            <div class="info-grid">
+                <div class="info-card">
+                    <h4>📍 Localização</h4>
+                    <p>Rua Buenos Aires, 1335 — Curitiba, PR</p>
+                    <a href="https://maps.google.com/?q=D'Five+Arena+Lounge+Curitiba" target="_blank" class="link-seta">Como chegar →</a>
+                </div>
+
+                <div class="info-card">
+                    <h4>🕐 Funcionamento</h4>
+                    <p>Quarta à Sexta — 17h às 01h</p>
+                    <p>Sabádo e Domingo — 12h às 01h</p>
+                    <p class="info-sub">Demais dias sob consulta</p>
+                </div>
+
+            </div>
+
+            <div class="mapa-embed">
+                <iframe
+                    src="https://www.google.com/maps?q=Curitiba,PR&output=embed"
+                    width="100%" height="300" style="border:0;" allowfullscreen="" loading="lazy">
+                </iframe>
+            </div>
+        </section>
+
+        <!-- ===== DEPOIMENTOS ===== -->
+        <section class="secao reveal">
+            <h3 class="secao-titulo">Quem Já Viveu</h3>
+            <div class="depoimentos-carrossel">
+                <div class="depoimento-card">
+                    <p class="depoimento-texto">"Ambiente impecável, som de altíssima qualidade e atendimento nota 10."</p>
+                    <span class="depoimento-autor">— Camila R. · Google</span>
+                </div>
+                <div class="depoimento-card">
+                    <p class="depoimento-texto">"Melhor casa noturna de Curitiba, sem dúvidas. Voltarei sempre."</p>
+                    <span class="depoimento-autor">— Lucas F. · Google</span>
+                </div>
+                <div class="depoimento-card">
+                    <p class="depoimento-texto">"Estrutura premium, drinks incríveis e line-up sempre certeiro."</p>
+                    <span class="depoimento-autor">— Marina T. · Google</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== LISTA VIP / NEWSLETTER ===== -->
+        <section class="secao reveal" id="vip" data-cena="vip">
+            <div class="cartao cartao-vip">
+                <h3 class="cartao-titulo">Lista VIP</h3>
+                <p class="cartao-texto">Receba em primeira mão os próximos eventos e condições exclusivas.</p>
+                <form class="vip-form" id="vipForm">
+                    <input type="text" placeholder="Seu WhatsApp" required>
+                    <button type="submit">Entrar na lista</button>
+                </form>
+                <p class="vip-confirmacao" id="vipConfirmacao">Recebido! Em breve você entra na lista. ✨</p>
+            </div>
+        </section>
+
+        <!-- ===== LINKS / REDES SOCIAIS ===== -->
+        <section class="secao reveal">
+            <div class="cartao">
+                <ul class="links-lista">
+                    <li>
+                        <a href="#athletico">
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2 2 7v6c0 5 4.2 8.5 10 9 5.8-.5 10-4 10-9V7l-10-5z"/></svg>
+                            Dia de Jogo · Athletico
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://instagram.com" target="_blank">
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2c2.7 0 3 .01 4.1.06 1.1.05 1.8.22 2.4.46.7.27 1.2.6 1.7 1.1.5.5.9 1 1.1 1.7.24.6.4 1.3.46 2.4.05 1.1.06 1.4.06 4.1s-.01 3-.06 4.1c-.05 1.1-.22 1.8-.46 2.4-.27.7-.6 1.2-1.1 1.7-.5.5-1 .9-1.7 1.1-.6.24-1.3.4-2.4.46-1.1.05-1.4.06-4.1.06s-3-.01-4.1-.06c-1.1-.05-1.8-.22-2.4-.46-.7-.27-1.2-.6-1.7-1.1-.5-.5-.9-1-1.1-1.7-.24-.6-.4-1.3-.46-2.4C2.01 15 2 14.7 2 12s.01-3 .06-4.1c.05-1.1.22-1.8.46-2.4.27-.7.6-1.2 1.1-1.7.5-.5 1-.9 1.7-1.1.6-.24 1.3-.4 2.4-.46C9 2.01 9.3 2 12 2zm0 5a5 5 0 100 10 5 5 0 000-10zm0 8.2a3.2 3.2 0 110-6.4 3.2 3.2 0 010 6.4zm5.4-8.4a1.2 1.2 0 100-2.4 1.2 1.2 0 000 2.4z"/></svg>
+                            Instagram
+                        </a>
+                    </li>
+                    <li>
+                        <a href="produtos.html">
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M4 4h16l-1.5 9h-13z" opacity=".3"/><path d="M6 2l1.5 3H21a1 1 0 01.98 1.2l-1.6 8A2 2 0 0118.4 16H8a1 1 0 01-.98-.8L4.34 4H2V2h4zm2.5 5l1.2 6h8.6l1.2-6H8.5zM8 18a2 2 0 100 4 2 2 0 000-4zm9 0a2 2 0 100 4 2 2 0 000-4z"/></svg>
+                            Produtos
+                        </a>
+                    </li>
+                    <li>
+                        <a href="contato.html">
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M2 4h20v16H2z" opacity="0"/><path d="M2 6a2 2 0 012-2h16a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V6zm2 0l8 6 8-6"/></svg>
+                            Contato
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="rodape">
+        <p>© 2026 D'Five Arena Lounge · Beba com moderação</p>
+        <p class="rodape-sub">Proibida a entrada de menores de 18 anos</p>
+    </footer>
+
+    <!-- ===== BOTÕES FIXOS ===== -->
+    <a href="https://wa.me/5541999999999" target="_blank" class="btn-flutuante btn-whatsapp" aria-label="WhatsApp">
+        <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor"><path d="M12 2a10 10 0 00-8.6 15L2 22l5.2-1.4A10 10 0 1012 2zm0 18a8 8 0 01-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1112 20zm4.4-6c-.2-.1-1.4-.7-1.6-.8-.2-.1-.4-.1-.5.1-.2.2-.6.8-.8 1-.1.2-.3.2-.5.1-.7-.3-1.4-.7-2-1.3-.5-.5-1-1.1-1.4-1.7-.1-.2 0-.4.1-.5.1-.1.2-.3.4-.4.1-.1.2-.3.2-.4.1-.2 0-.3 0-.4-.1-.1-.5-1.3-.7-1.8-.2-.4-.4-.4-.5-.4h-.5c-.2 0-.4.1-.6.3-.2.2-.8.8-.8 1.9s.8 2.2 1 2.4c.1.2 1.6 2.5 4 3.5.6.2 1 .4 1.3.5.6.2 1.1.2 1.5.1.5-.1 1.4-.6 1.6-1.1.2-.5.2-1 .1-1.1-.1-.1-.2-.2-.4-.3z"/></svg>
+    </a>
+
+    <a href="#eventos" class="btn-flutuante btn-ingresso" id="btnIngresso" aria-label="Comprar ingressos">
+        <span class="btn-ingresso-glow" aria-hidden="true"></span>
+        <span class="btn-ingresso-icone">🎟️</span>
+        <span>Ingressos</span>
+    </a>
+
+    <!-- GSAP + ScrollTrigger -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+    <!-- Lenis: scroll suave -->
+    <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.min.js"></script>
+
+    <!-- Vanilla Tilt.js: efeito 3D nos cards do line-up e botão de ingressos -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.1/vanilla-tilt.min.js"></script>
+
+    <!-- AOS.js: animações de entrada nas seções -->
+    <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+
+    <script src="anime.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
